@@ -10,6 +10,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-read.csv("Desktop/big_data")
+big <- read.csv("../big_data.csv")
+small <- read.csv("../small_data.csv")
+```
+
+```{r}
+
 ```
 
