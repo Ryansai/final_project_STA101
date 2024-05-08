@@ -9,3 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+read.csv("../Desktop/final_project_STA101/Large dataset for final sta101-Sheet1.csv")
+```
+
