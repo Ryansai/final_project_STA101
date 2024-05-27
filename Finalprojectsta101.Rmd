@@ -18,9 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 library(rptR)
-#library(MCMCglmm)
-#library(lme4)
-#install.packages("Matrix", repos = "http://R-Forge.R-project.org")
+#library(MCMCglmm)3
 
 
 ```
