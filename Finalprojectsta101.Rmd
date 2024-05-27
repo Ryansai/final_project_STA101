@@ -5,16 +5,36 @@ date: "2024-05-07"
 output: html_document
 ---
 
+#they use seconds moving and bodily contact time to measure activity and affiliation
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-big <- read.csv("../big_data.csv")
-small <- read.csv("../small_data.csv")
+#install.packages("Matrix")
+#library(Matrix)
+#remove.packages("Matrix")
+library(dplyr)
+library(ggplot2)
+library(rptR)
+#library(MCMCglmm)
+library(lme4)
+
+
 ```
 
 ```{r}
-names(big) = c("")
+wasp <- read.csv("../final_project_STA101/wasp.csv")
 ```
+
+```{r}
+summary(wasp)
+```
+```{r}
+activity1 <- rpt(seconds_moving ~ (1|Wasp.ID), grname = c("Wasp.ID"), data = wasp,
+                 datatype = "Gaussian", nboot = 1000, ratio = TRUE)
+```
+#when creating model they used poisson distribution.
+
+
 
