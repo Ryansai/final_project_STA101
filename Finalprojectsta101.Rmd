@@ -55,6 +55,11 @@ activity3 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp
 ```{r}
 summary(activity3)
 ```
+
+
+
+
+###trying to use lmer function
 ```{r}
 library(lme4)
 ```
@@ -64,7 +69,9 @@ lmer_fxn_trial <- lmer(seconds_moving ~ Trial + weight + (1|Wasp.ID), data = was
 ```
 
 ```{r}
-summary(lmer)
+summary(lmer_fxn_trial)
 ```
+
+
 
 
