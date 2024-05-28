@@ -12,12 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 #install.packages("Matrix")
-#library(Matrix)
+library(Matrix)
 #remove.packages("Matrix")
 #install.packages("/Users/apple/Downloads/Matrix_1.2-7.1.tar", repos = "NULL", type = "source")
 library(dplyr)
 library(ggplot2)
 library(rptR)
+library(lme4)
 #library(MCMCglmm)3
 
 
