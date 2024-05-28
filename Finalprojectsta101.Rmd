@@ -36,7 +36,35 @@ summary(wasp)
 activity1 <- rpt(seconds_moving ~ (1|Wasp.ID), grname = c("Wasp.ID"), data = wasp,
                  datatype = "Gaussian", nboot = 1000, ratio = TRUE)
 ```
+```{r}
+summary(activity1)
+```
+
 #when creating model they used poisson distribution.
 
+```{r}
+activity2 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
+                 datatype = "Gaussian", nboot = 1000, ratio = TRUE)
+summary(activity2)
+```
+```{r}
+activity3 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
+                 datatype = "Gaussian", nboot = 1000, ratio = FALSE)
+```
+
+```{r}
+summary(activity3)
+```
+```{r}
+library(lme4)
+```
+
+```{r}
+lmer_fxn_trial <- lmer(seconds_moving ~ Trial + weight + (1|Wasp.ID), data = wasp)
+```
+
+```{r}
+summary(lmer)
+```
 
 
