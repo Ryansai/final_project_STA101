@@ -79,5 +79,26 @@ summary(lmer_fxn_trial)
 
 ### article and important quote: https://stats.stackexchange.com/questions/231080/can-mcmcglmm-in-r-be-used-similarly-to-lmer
 ### "MCMCglmm and lmer are both functions that can be used for fitting linear mixed models. MCMCglmm takes a Bayesian approach where priors must be specified for fixed and random effects, enabling inference via Markov Chain Monte Carlo sampling, whereas lmer takes a likelihood approach within the frequentist paradigm."
+### include other predictor variables???  potentially take out + Log_aggression + scale(seconds_moving) + anntenation... ask. 
+```{r}
+lmer_model_affilitation_full <- lmer(bodily_contact_time ~ Dummy_Color + Trial + weight + Log_aggression + scale(seconds_moving) + anntenation + (1|Wasp.ID), data = wasp)
+lmer_model_affilitation_empty <- lmer(bodily_contact_time ~ (1|Wasp.ID), data = wasp)
+```
 
+```{r}
+#install.packages("MPV")
+#install.packages("leaps")
+library(MPV)
+library(leaps)
+library(MASS)
+#install.packages("lmerTest")
+```
+
+```{r}
+lmerTest::step(lmer_model_affilitation_full)
+```
+
+```{r}
+
+```
 
