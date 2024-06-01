@@ -4,7 +4,7 @@ author: "Ryan Chiang"
 date: "2024-05-07"
 output: html_document
 ---
-
+### select for model correctness BIC
 #they use seconds moving and bodily contact time to measure activity and affiliation
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -33,30 +33,30 @@ wasp <- read.csv("../final_project_STA101/wasp.csv")
 
 ### Repeatability is an important measurement when conducting and analyszing research. Finish doing the repeatability values later. 
 ```{r}
-summary(wasp)
+#summary(wasp)
 ```
 ```{r}
-activity1 <- rpt(seconds_moving ~ (1|Wasp.ID), grname = c("Wasp.ID"), data = wasp,
+#activity1 <- rpt(seconds_moving ~ (1|Wasp.ID), grname = c("Wasp.ID"), data = wasp,
                  datatype = "Gaussian", nboot = 1000, ratio = TRUE)
 ```
 ```{r}
-summary(activity1)
+#summary(activity1)
 ```
 
 #when creating model they used poisson distribution.
 
 ```{r}
-activity2 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
+#activity2 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
                  datatype = "Gaussian", nboot = 1000, ratio = TRUE)
-summary(activity2)
+#summary(activity2)
 ```
 ```{r}
-activity3 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
+#activity3 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
                  datatype = "Gaussian", nboot = 1000, ratio = FALSE)
 ```
 
 ```{r}
-summary(activity3)
+#summary(activity3)
 ```
 
 
@@ -80,10 +80,123 @@ summary(lmer_fxn_trial)
 ### article and important quote: https://stats.stackexchange.com/questions/231080/can-mcmcglmm-in-r-be-used-similarly-to-lmer
 ### "MCMCglmm and lmer are both functions that can be used for fitting linear mixed models. MCMCglmm takes a Bayesian approach where priors must be specified for fixed and random effects, enabling inference via Markov Chain Monte Carlo sampling, whereas lmer takes a likelihood approach within the frequentist paradigm."
 ### include other predictor variables???  potentially take out + Log_aggression + scale(seconds_moving) + anntenation... ask. 
+
+
+#### ADD CHAMBERS ENTERED 
+
 ```{r}
-lmer_model_affilitation_full <- lmer(bodily_contact_time ~ Dummy_Color + Trial + weight + Log_aggression + scale(seconds_moving) + anntenation + (1|Wasp.ID), data = wasp)
-lmer_model_affilitation_empty <- lmer(bodily_contact_time ~ (1|Wasp.ID), data = wasp)
+lm_model_affiliation <- lm(bodily_contact_time ~ Dummy_Color + Trial + weight + Log_aggression + seconds_moving + anntenation + chambers_entered, data =wasp)
+lm_model_affiliation
+lm_empty_affiliation_model <- lm(bodily_contact_time ~ 1, data = wasp)
 ```
+```{r}
+n = nrow(wasp)
+```
+
+```{r}
+aff_backward.model.BIC = stepAIC(lm_model_affiliation,  scope = list(lower = lm_empty_affiliation_model, upper= lm_model_affiliation), k = log(n),trace=FALSE,direction = "backward")
+aff_forward.model.BIC = stepAIC(lm_empty_affiliation_model,  scope = list(lower = lm_empty_affiliation_model, upper= lm_model_affiliation), k = log(n),direction = "forward")
+aff_FB.model.BIC = stepAIC(lm_empty_affiliation_model,  scope = list(lower = lm_empty_affiliation_model, upper= lm_model_affiliation), k = log(n),trace=FALSE,direction = "both")
+aff_BF.model.BIC = stepAIC(lm_model_affiliation,  scope = list(lower = lm_empty_affiliation_model, upper= lm_model_affiliation), k = log(n),trace=FALSE,direction = "both")
+
+BIC(aff_backward.model.BIC)
+BIC(aff_forward.model.BIC)
+BIC(aff_FB.model.BIC)
+BIC(aff_BF.model.BIC)
+
+aff_BF.model.BIC
+```
+
+
+```{r}
+lmer_model_affilitation <- lmer(seconds_moving ~ Trial + seconds_moving + (1|Wasp.ID), data = wasp)
+```
+
+```{r}
+lm_model_ant <- lm(anntenation ~ Dummy_Color + Trial + weight + Log_aggression + seconds_moving + bodily_contact_time + chambers_entered, data =wasp)
+lm_model_ant
+lm_empty_ant <- lm(anntenation ~ 1, data = wasp)
+```
+```{r}
+ant_backward.model.BIC = stepAIC(lm_model_ant,  scope = list(lower = lm_empty_ant, upper= lm_model_ant), k = log(n),trace=FALSE,direction = "backward")
+ant_forward.model.BIC = stepAIC(lm_empty_ant,  scope = list(lower = lm_empty_ant, upper= lm_model_ant), k = log(n),direction = "forward")
+ant_FB.model.BIC = stepAIC(lm_empty_ant,  scope = list(lower = lm_empty_ant, upper= lm_model_ant), k = log(n),trace=FALSE,direction = "both")
+ant_BF.model.BIC = stepAIC(lm_model_ant,  scope = list(lower = lm_empty_ant, upper= lm_model_ant), k = log(n),trace=FALSE,direction = "both")
+```
+```{r}
+BIC(ant_backward.model.BIC)
+BIC(ant_forward.model.BIC)
+BIC(ant_BF.model.BIC)
+BIC(ant_FB.model.BIC)
+ant_BF.model.BIC
+```
+```{r}
+lmer_model_ant <- lmer(anntenation ~ Log_aggression + (1|Wasp.ID), data = wasp)
+```
+
+###mixed effect model better. 
+```{r}
+BIC(lmer_model_ant)
+```
+
+```{r}
+lm_model_agg <- lm(Log_aggression ~ Dummy_Color + Trial + weight + bodily_contact_time + seconds_moving + anntenation + chambers_entered, data =wasp)
+lm_model_agg
+lm_empty_agg <- lm(Log_aggression ~ 1, data = wasp)
+```
+
+```{r}
+agg_backward.model.BIC = stepAIC(lm_model_agg,  scope = list(lower = lm_empty_agg, upper= lm_model_agg), k = log(n),trace=FALSE,direction = "backward")
+agg_forward.model.BIC = stepAIC(lm_empty_agg,  scope = list(lower = lm_empty_agg, upper= lm_model_agg), k = log(n),direction = "forward")
+agg_FB.model.BIC = stepAIC(lm_empty_agg,  scope = list(lower = lm_empty_agg, upper= lm_model_agg), k = log(n),trace=FALSE,direction = "both")
+agg_BF.model.BIC = stepAIC(lm_model_agg,  scope = list(lower = lm_empty_agg, upper= lm_model_agg), k = log(n),trace=FALSE,direction = "both")
+```
+```{r}
+BIC(agg_backward.model.BIC)
+BIC(agg_forward.model.BIC)
+BIC(agg_BF.model.BIC)
+BIC(agg_FB.model.BIC)
+agg_BF.model.BIC
+```
+
+```{r}
+lmer_model_agg <- lmer(Log_aggression ~ Dummy_Color + anntenation + (1|Wasp.ID), data = wasp)
+```
+
+#Mixed effect model not better 
+```{r}
+BIC(lmer_model_agg)
+```
+
+```{r}
+lm_model_exp <- lm(chambers_entered ~ Dummy_Color + Trial + weight + Log_aggression + seconds_moving + bodily_contact_time + anntenation, data =wasp)
+lm_model_exp
+lm_empty_exp <- lm(chambers_entered ~ 1, data = wasp)
+```
+```{r}
+exp_backward.model.BIC = stepAIC(lm_model_exp,  scope = list(lower = lm_empty_exp, upper= lm_model_exp), k = log(n),trace=FALSE,direction = "backward")
+exp_forward.model.BIC = stepAIC(lm_empty_exp,  scope = list(lower = lm_empty_exp, upper= lm_model_exp), k = log(n),direction = "forward")
+exp_FB.model.BIC = stepAIC(lm_empty_exp,  scope = list(lower = lm_empty_exp, upper= lm_model_exp), k = log(n),trace=FALSE,direction = "both")
+exp_BF.model.BIC = stepAIC(lm_model_exp,  scope = list(lower = lm_empty_exp, upper= lm_model_exp), k = log(n),trace=FALSE,direction = "both")
+```
+
+```{r}
+BIC(exp_backward.model.BIC)
+BIC(exp_forward.model.BIC)
+BIC(exp_BF.model.BIC)
+BIC(exp_FB.model.BIC)
+exp_BF.model.BIC
+```
+##LMER MODEL NOT BETTER. 
+```{r}
+lmer_model_exp <- lmer(chambers_entered ~ seconds_moving + (1|Wasp.ID), data = wasp)
+BIC(lmer_model_exp)
+```
+
+
+
+
+
 
 ```{r}
 #install.packages("MPV")
