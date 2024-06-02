@@ -35,30 +35,6 @@ wasp <- read.csv("../final_project_STA101/wasp.csv")
 ```{r}
 #summary(wasp)
 ```
-```{r}
-#activity1 <- rpt(seconds_moving ~ (1|Wasp.ID), grname = c("Wasp.ID"), data = wasp,
-                 datatype = "Gaussian", nboot = 1000, ratio = TRUE)
-```
-```{r}
-#summary(activity1)
-```
-
-#when creating model they used poisson distribution.
-
-```{r}
-#activity2 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
-                 datatype = "Gaussian", nboot = 1000, ratio = TRUE)
-#summary(activity2)
-```
-```{r}
-#activity3 <- rpt(seconds_moving ~ Trial + weight + (1|Wasp.ID), grname = c("Wasp.ID", "Fixed", "Residual"), data = wasp,
-                 datatype = "Gaussian", nboot = 1000, ratio = FALSE)
-```
-
-```{r}
-#summary(activity3)
-```
-
 
 
 
@@ -82,13 +58,17 @@ summary(lmer_fxn_trial)
 ### include other predictor variables???  potentially take out + Log_aggression + scale(seconds_moving) + anntenation... ask. 
 
 
-#### ADD CHAMBERS ENTERED 
 
 ```{r}
 lm_model_affiliation <- lm(bodily_contact_time ~ Dummy_Color + Trial + weight + Log_aggression + seconds_moving + anntenation + chambers_entered, data =wasp)
 lm_model_affiliation
 lm_empty_affiliation_model <- lm(bodily_contact_time ~ 1, data = wasp)
 ```
+
+```{r}
+plot(lm_model_affiliation)
+```
+
 ```{r}
 n = nrow(wasp)
 ```
@@ -107,10 +87,41 @@ BIC(aff_BF.model.BIC)
 aff_BF.model.BIC
 ```
 
+```{r}
+confint(aff_BF.model.BIC)
+```
 
 ```{r}
-lmer_model_affilitation <- lmer(seconds_moving ~ Trial + seconds_moving + (1|Wasp.ID), data = wasp)
+plot(aff_BF.model.BIC)
 ```
+
+
+
+
+
+
+```{r}
+lmer_model_affilitation <- lmer(bodily_contact_time ~ Trial + seconds_moving + (1|Wasp.ID), data = wasp)
+BIC(lmer_model_affilitation)
+```
+
+```{r}
+shapiro.test(resid(lmer_model_affilitation))
+```
+
+
+```{r}
+Group.aff = rep("Lower",nrow(wasp)) #Creates a vector that repeats "Lower" n times
+Group.aff[wasp$bodily_contact_time < median(wasp$bodily_contact_time)] = "Upper" #Changing the appropriate values to "Upper"
+Group.aff = as.factor(Group.aff) #Changes it to a factor, which R recognizes as a grouping variable.
+fligner.test(lmer_model_affilitation$residuals, Group.aff)
+```
+
+
+```{r}
+plot(lmer_model_affilitation)
+```
+
 
 ```{r}
 lm_model_ant <- lm(anntenation ~ Dummy_Color + Trial + weight + Log_aggression + seconds_moving + bodily_contact_time + chambers_entered, data =wasp)
@@ -123,6 +134,7 @@ ant_forward.model.BIC = stepAIC(lm_empty_ant,  scope = list(lower = lm_empty_ant
 ant_FB.model.BIC = stepAIC(lm_empty_ant,  scope = list(lower = lm_empty_ant, upper= lm_model_ant), k = log(n),trace=FALSE,direction = "both")
 ant_BF.model.BIC = stepAIC(lm_model_ant,  scope = list(lower = lm_empty_ant, upper= lm_model_ant), k = log(n),trace=FALSE,direction = "both")
 ```
+
 ```{r}
 BIC(ant_backward.model.BIC)
 BIC(ant_forward.model.BIC)
@@ -133,6 +145,13 @@ ant_BF.model.BIC
 ```{r}
 lmer_model_ant <- lmer(anntenation ~ Log_aggression + (1|Wasp.ID), data = wasp)
 ```
+
+```{r}
+shapiro.test(resid(lmer_model_ant))
+```
+
+### try fligner test for this 
+
 
 ###mixed effect model better. 
 ```{r}
@@ -161,6 +180,7 @@ agg_BF.model.BIC
 
 ```{r}
 lmer_model_agg <- lmer(Log_aggression ~ Dummy_Color + anntenation + (1|Wasp.ID), data = wasp)
+lmer_model_agg
 ```
 
 #Mixed effect model not better 
@@ -187,11 +207,24 @@ BIC(exp_BF.model.BIC)
 BIC(exp_FB.model.BIC)
 exp_BF.model.BIC
 ```
+
+```{r}
+shapiro.test(resid(exp_BF.model.BIC))
+```
+
+```{r}
+Group.exp = rep("Lower",nrow(wasp)) #Creates a vector that repeats "Lower" n times
+Group.exp[wasp$chambers_entered < median(wasp$chambers_entered)] = "Upper" #Changing the appropriate values to "Upper"
+Group.exp = as.factor(Group.exp) #Changes it to a factor, which R recognizes as a grouping variable.
+fligner.test(exp_BF.model.BIC$residuals, Group.exp)
+```
+
 ##LMER MODEL NOT BETTER. 
 ```{r}
 lmer_model_exp <- lmer(chambers_entered ~ seconds_moving + (1|Wasp.ID), data = wasp)
 BIC(lmer_model_exp)
 ```
+
 
 
 
