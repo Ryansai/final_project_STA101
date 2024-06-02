@@ -25,6 +25,7 @@ library(rptR)
 library(MCMCglmm)
 library(MPV)
 library(leaps)
+library(MASS)
 ```
 
 ```{r}
@@ -113,10 +114,10 @@ shapiro.test(resid(lmer_model_affilitation))
 
 
 ```{r}
-Group.aff = rep("Lower",nrow(wasp)) #Creates a vector that repeats "Lower" n times
-Group.aff[wasp$bodily_contact_time < median(wasp$bodily_contact_time)] = "Upper" #Changing the appropriate values to "Upper"
-Group.aff = as.factor(Group.aff) #Changes it to a factor, which R recognizes as a grouping variable.
-fligner.test(lmer_model_affilitation$residuals, Group.aff)
+#Group.aff = rep("Lower",nrow(wasp)) #Creates a vector that repeats "Lower" n times
+#Group.aff[wasp$bodily_contact_time < median(wasp$bodily_contact_time)] = "Upper" #Changing the appropriate values to "Upper"
+#Group.aff = as.factor(Group.aff) #Changes it to a factor, which R recognizes as a grouping variable.
+#fligner.test(lmer_model_affilitation$residuals, Group.aff)
 ```
 
 
@@ -243,7 +244,7 @@ library(MASS)
 ```
 
 ```{r}
-lmerTest::step(lmer_model_affilitation_full)
+#lmerTest::step(lmer_model_affilitation_full)
 ```
 
 ```{r}
