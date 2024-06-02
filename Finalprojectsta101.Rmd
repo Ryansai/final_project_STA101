@@ -2,7 +2,9 @@
 title: "Final Project"
 author: "Ryan Chiang"
 date: "2024-05-07"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ### select for model correctness BIC
 #they use seconds moving and bodily contact time to measure activity and affiliation
@@ -21,8 +23,8 @@ library(ggplot2)
 library(rptR)
 #library(lme4)
 library(MCMCglmm)
-
-
+library(MPV)
+library(leaps)
 ```
 
 ```{r}
