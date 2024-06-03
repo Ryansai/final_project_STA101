@@ -6,8 +6,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-### select for model correctness BIC
-#they use seconds moving and bodily contact time to measure activity and affiliation
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -32,34 +31,9 @@ library(MASS)
 wasp <- read.csv("../final_project_STA101/wasp.csv")
 ```
 
-### https://cran.r-project.org/web/packages/rptR/vignettes/rptR.html
-
-### Repeatability is an important measurement when conducting and analyszing research. Finish doing the repeatability values later. 
 ```{r}
 #summary(wasp)
 ```
-
-
-
-###trying to use lmer function
-```{r}
-library(lme4)
-```
-
-```{r}
-lmer_fxn_trial <- lmer(seconds_moving ~ Trial + weight + (1|Wasp.ID), data = wasp)
-```
-
-```{r}
-summary(lmer_fxn_trial)
-```
-
-### model selection
-
-### article and important quote: https://stats.stackexchange.com/questions/231080/can-mcmcglmm-in-r-be-used-similarly-to-lmer
-### "MCMCglmm and lmer are both functions that can be used for fitting linear mixed models. MCMCglmm takes a Bayesian approach where priors must be specified for fixed and random effects, enabling inference via Markov Chain Monte Carlo sampling, whereas lmer takes a likelihood approach within the frequentist paradigm."
-### include other predictor variables???  potentially take out + Log_aggression + scale(seconds_moving) + anntenation... ask. 
-
 
 
 ```{r}
