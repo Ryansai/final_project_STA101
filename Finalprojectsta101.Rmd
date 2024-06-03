@@ -178,6 +178,40 @@ BIC(agg_BF.model.BIC)
 BIC(agg_FB.model.BIC)
 agg_BF.model.BIC
 ```
+```{r}
+confint(agg_BF.model.BIC)
+```
+
+###anova on color 
+
+```{r}
+library(asbio)
+```
+```{r}
+group.means = by(wasp$Log_aggression,wasp$Dummy_Color,mean)  # First argument is Y, second is grouping column/s
+plot(group.means,xaxt = "n",pch = 19,col = "purple",xlab = "Dummy Color",ylab = "Log Aggression",main = "Aggression by Dummy Color",type = "b") #Addinf xaxt = "n" removes the default X axis ticks.
+axis(1,1:length(group.means),names(group.means)) #Adding in our own X axis names
+```
+
+```{r}
+boxplot(wasp$Log_aggression ~ wasp$Dummy_Color, main = "Aggression by Dummy Color",ylab = "Log Aggression")
+```
+
+```{r}
+bonfCI(wasp$Log_aggression,as.factor(wasp$Dummy_Color), conf.level = 0.95)
+```
+
+
+```{r}
+shapiro.test(resid(agg_BF.model.BIC))
+```
+
+```{r}
+Group.agg = rep("Lower",nrow(wasp)) #Creates a vector that repeats "Lower" n times
+Group.agg[wasp$Log_aggression < median(wasp$Log_aggression)] = "Upper" #Changing the appropriate values to "Upper"
+Group.agg = as.factor(Group.agg) #Changes it to a factor, which R recognizes as a grouping variable.
+fligner.test(agg_BF.model.BIC$residuals, Group.agg)
+```
 
 ```{r}
 plot(agg_BF.model.BIC)
@@ -188,7 +222,6 @@ lmer_model_agg <- lmer(Log_aggression ~ Dummy_Color + anntenation + (1|Wasp.ID),
 lmer_model_agg
 ```
 
-#Mixed effect model not better 
 ```{r}
 BIC(lmer_model_agg)
 ```
@@ -267,6 +300,11 @@ plot(lmer_model_act)
 ```{r}
 qqnorm(resid(lmer_model_act))
 qqline(resid(lmer_model_act))
+```
+
+
+```{r}
+shapiro.test(resid(act_BF.model.BIC))
 ```
 
 
