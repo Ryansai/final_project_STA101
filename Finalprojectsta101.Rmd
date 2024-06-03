@@ -109,6 +109,11 @@ BIC(lmer_model_affilitation)
 ```
 
 ```{r}
+
+```
+
+
+```{r}
 shapiro.test(resid(lmer_model_affilitation))
 ```
 
