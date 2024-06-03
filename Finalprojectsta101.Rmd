@@ -187,18 +187,28 @@ confint(agg_BF.model.BIC)
 ```{r}
 library(asbio)
 ```
+
+```{r}
+anova_empty_model_aggression = lm(Log_aggression ~ 1, data =wasp)
+anova_full_model_aggression = lm(Log_aggression ~ Dummy_Color, data=wasp)
+```
+
 ```{r}
 group.means = by(wasp$Log_aggression,wasp$Dummy_Color,mean)  # First argument is Y, second is grouping column/s
 plot(group.means,xaxt = "n",pch = 19,col = "purple",xlab = "Dummy Color",ylab = "Log Aggression",main = "Aggression by Dummy Color",type = "b") #Addinf xaxt = "n" removes the default X axis ticks.
 axis(1,1:length(group.means),names(group.means)) #Adding in our own X axis names
 ```
+```{r}
+anova(anova_empty_model_aggression, anova_full_model_aggression)
+```
+
 
 ```{r}
 boxplot(wasp$Log_aggression ~ wasp$Dummy_Color, main = "Aggression by Dummy Color",ylab = "Log Aggression")
 ```
 
 ```{r}
-bonfCI(wasp$Log_aggression,as.factor(wasp$Dummy_Color), conf.level = 0.95)
+
 ```
 
 
