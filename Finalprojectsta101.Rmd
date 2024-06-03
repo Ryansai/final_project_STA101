@@ -132,7 +132,6 @@ lmer_model_ant <- lmer(anntenation ~ Log_aggression + (1|Wasp.ID), data = wasp)
 shapiro.test(resid(lmer_model_ant))
 ```
 
-### try fligner test for this 
 
 
 ###mixed effect model better. 
@@ -189,6 +188,11 @@ BIC(exp_BF.model.BIC)
 BIC(exp_FB.model.BIC)
 exp_BF.model.BIC
 ```
+
+```{r}
+plot(exp_BF.model.BIC)
+```
+
 
 ```{r}
 shapiro.test(resid(exp_BF.model.BIC))
