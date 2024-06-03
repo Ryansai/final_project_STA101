@@ -25,6 +25,7 @@ library(MCMCglmm)
 library(MPV)
 library(leaps)
 library(MASS)
+library(lme4)
 ```
 
 ```{r}
@@ -68,9 +69,7 @@ aff_BF.model.BIC
 confint(aff_BF.model.BIC)
 ```
 
-```{r}
-plot(aff_BF.model.BIC)
-```
+
 
 
 
@@ -81,10 +80,18 @@ plot(aff_BF.model.BIC)
 lmer_model_affilitation <- lmer(bodily_contact_time ~ Trial + seconds_moving + (1|Wasp.ID), data = wasp)
 BIC(lmer_model_affilitation)
 ```
+```{r}
+plot(aff_backward.model.BIC)
+```
 
 ```{r}
-
+plot(lmer_model_affilitation)
 ```
+```{r}
+qqnorm(resid(lmer_model_affilitation))
+qqline(resid(lmer_model_affilitation))
+```
+
 
 
 ```{r}
@@ -124,8 +131,21 @@ BIC(ant_BF.model.BIC)
 BIC(ant_FB.model.BIC)
 ant_BF.model.BIC
 ```
+
 ```{r}
 lmer_model_ant <- lmer(anntenation ~ Log_aggression + (1|Wasp.ID), data = wasp)
+```
+
+```{r}
+plot(ant_BF.model.BIC)
+```
+
+```{r}
+plot(lmer_model_ant)
+```
+```{r}
+qqnorm(resid(lmer_model_ant))
+qqline(resid(lmer_model_ant))
 ```
 
 ```{r}
@@ -157,6 +177,10 @@ BIC(agg_forward.model.BIC)
 BIC(agg_BF.model.BIC)
 BIC(agg_FB.model.BIC)
 agg_BF.model.BIC
+```
+
+```{r}
+plot(agg_BF.model.BIC)
 ```
 
 ```{r}
@@ -211,6 +235,42 @@ lmer_model_exp <- lmer(chambers_entered ~ seconds_moving + (1|Wasp.ID), data = w
 BIC(lmer_model_exp)
 ```
 
+```{r}
+lm_model_act <- lm(seconds_moving ~ Dummy_Color + Trial + weight + bodily_contact_time + Log_aggression + anntenation + chambers_entered, data =wasp)
+lm_model_act
+lm_empty_act <- lm(seconds_moving ~ 1, data = wasp)
+```
+```{r}
+act_backward.model.BIC = stepAIC(lm_model_act,  scope = list(lower = lm_empty_act, upper= lm_model_act), k = log(n),trace=FALSE,direction = "backward")
+act_forward.model.BIC = stepAIC(lm_empty_act,  scope = list(lower = lm_empty_act, upper= lm_model_act), k = log(n),direction = "forward")
+act_FB.model.BIC = stepAIC(lm_empty_act,  scope = list(lower = lm_empty_act, upper= lm_model_act), k = log(n),trace=FALSE,direction = "both")
+act_BF.model.BIC = stepAIC(lm_model_act,  scope = list(lower = lm_empty_act, upper= lm_model_act), k = log(n),trace=FALSE,direction = "both")
+```
+
+```{r}
+BIC(act_backward.model.BIC)
+BIC(act_forward.model.BIC)
+BIC(act_BF.model.BIC)
+BIC(act_FB.model.BIC)
+act_BF.model.BIC
+```
+```{r}
+lmer_model_act <- lmer(seconds_moving ~ chambers_entered + (1|Wasp.ID), data = wasp)
+```
+```{r}
+BIC(lmer_model_act)
+```
+
+```{r}
+plot(lmer_model_act)
+```
+```{r}
+qqnorm(resid(lmer_model_act))
+qqline(resid(lmer_model_act))
+```
+
+
+
 
 
 
@@ -231,6 +291,8 @@ library(MASS)
 ```
 
 ```{r}
-
+lmer_model_affilitation
+lmer_model_act
+lmer_model_ant
 ```
 
