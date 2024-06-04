@@ -33,7 +33,7 @@ wasp <- read.csv("../final_project_STA101/wasp.csv")
 ```
 
 ```{r}
-#summary(wasp)
+summary(wasp)
 ```
 
 
