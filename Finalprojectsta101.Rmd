@@ -1,11 +1,81 @@
 ---
 title: "Final Project"
-author: "Ryan Chiang"
-date: "2024-05-07"
+author: "Ryan Chiang, Jaxi Cohen, Dahlia Friis, Emily Lieu"
+date: "Amy Kim"
 output:
   pdf_document: default
   html_document: default
 ---
+
+Replicating Statistical Analysis in the Paper “Behavioral Syndromes in Paper Wasps: Links Between Social and Non-social Personality in Paper Wasps”
+
+
+Introduction
+The paper investigates the relationships between social (aggression, affiliation, and antennation) and non-social (exploration and activity) personality traits of paper wasps. To model the social traits, researchers placed wasps in compartments with dead “dummy” wasps for 10 minutes, and recorded their behavior. To model the non-social traits, researchers placed wasps in a plexiglass arena consisting of 10 built in wooden chambers. The wasps were free to roam for 10 minutes. Aggression is measured by a count of aggressive behaviors displayed by the wasp. Affiliation is measured by the time spent in non-aggressive, stationary contact with the dummy wasp. Antennation is measured by taps by the wasp onto the dummy wasp with its antennae. Exploration is measured through a count of the number of chambers by the wasp in the maze. Lastly, activity is measured by the time spent by the wasp actively moving. These traits can be modeled and predicted with the variables of ID number, trial number, color of the dummy, and weight of the wasp.
+We chose to reproduce this paper because we are interested in the application of statistics for predicting animal behavior. Understanding the connection between social and non-social traits can help us understand behavioral syndromes, which are groups of personality traits that are phenotypically related with each other. Understanding this connection can help us learn about how traits respond to selection and what combinations of traits are better for different species and environments. 
+Response variables:
+Affiliation (bodily contact time): time spent by wasp in stationary, non aggressive contact with dummy, measured in seconds.
+Antennation: number of wasp taps on dummy with extended antennae, used for chemical assessment of other wasps; a neutral social behavior.
+Aggression (log aggression): count of aggressive behaviors displayed by wasp, including dart, dart with mandibles, antenna drumming, bite, mount; log-transformed data before analysis to normalize data. 
+Exploration (chambers entered): number of individual chambers entered by wasp. 
+Activity (seconds moving): time wasp spent actively moving inside the area, measured in seconds.
+Explanatory variables:
+Wasp.ID: identifying number assigned to each wasp.
+Trial: trial number per individual wasp.
+Dummy Color: Color of dummy wasp.
+Weight: Body weight of wasp, measured in grams.
+
+Summary Stats
+We did not look for outliers in our exploratory data analysis. Removing outliers from each model would quickly become complicated, as we would have to create a new data set excluding the outliers. Behavior is also highly variable and complex, so removing outliers might impact our data in ways we cannot predict. 
+	The wasps participated in four trials for each behavioral test. When the wasp was placed in a clear box with a dead dummy wasp for 10 minutes, the non-aggressive bodily contact time spent between the wasp and the dummy averaged 183.5 seconds. The maximum was 589 seconds and the minimum was zero. The average time the wasp spent exploring the dummy via antennation averaged 5.6 seconds. The maximum was 16 and the minimum was zero. In terms of aggressive behavior, the authors measured how long the wasp spent being aggressive to the dummy in seconds and log-transformed it to normalize the data. The log-transformed average for aggressive behavior is 0.69 seconds. The maximum was three seconds and the minimum was zero. 
+	When the wasps were placed in the maze and given 10 minutes to roam, the average amount of chambers entered was five. The maximum was 10 chambers and the minimum was zero. The average amount of time wasps spent moving in the maze was 230 seconds. The maximum was 591 seconds and the minimum was five seconds. The authors recorded the weight of the wasps, though it is unclear how the weight of the wasps impacted their behavior. The average weight of the wasps was 0.15 grams, with the maximum being 0.19 grams and the minimum being 0.09 grams. 
+Model fitting
+The behaviors we are modeling are affiliation, aggression, activity, antennation, and exploration. We started with a multiple regression model for each behavior that has all the remaining behaviors and factors as the predictor variables. We performed stepwise selection on each model to pick the best predictor variable(s). The results are five fixed effects, linear regression models (lm) where one behavior is the response variable and a different behavior, and sometimes other factors, are the predictor variables. Then we found the BIC of each final lm model. Next, we constructed additional models containing all the same explanatory variables as our final lm models but with an added random effect variable for wasp ID. The wasp ID is used to check if there is a significant difference in behavior between individual wasps in the study. We used the lmer function to create our mixed effect models. We obtained their BIC’s. The final lm and corresponding lmer functions were compared to each other. Whichever model had the lower BIC was selected to be our final model for a given behavior. This results in a combination of linear and mixed models. Affiliation and antenation fit better as mixed effect models, aggression and exploration fit better as fixed effect, linear regression models.
+
+Antennation ~ log aggression + wasp ID
+Aggression ~ dummy color + antennation
+Exploration ~ activity
+Affiliation ~ trial number + activity + wasp ID
+Activity ~ exploration + wasp ID
+Model diagnostics
+The assumptions for linear mixed effects models are the same for multiple regression models: constant and normal distribution of errors, a linear model is appropriate, and a random sample is taken. We assume a random sample is taken and a linear model must be appropriate. For normality of errors we used the Shapiro-Wilks (SW) test and qq plots. Our p-values for all of the tests were very low. Therefore we reject the null hypothesis at alpha = 0.05 and support the alternative that our models do not have normality of errors. To test for constant variance of errors we created residual plots and performed the Fligner-Killeen (FK) test on our models when available. We were unable to do FK tests on our mixed models. For exploration and aggression we reject the null hypothesis at alpha = 0.05, indicating there is not constant variance of errors. For all our residual plots, except antenation, we found the average residual to be far from zero and/or a pattern in the plot. Therefore, there is not constant variance of errors.  
+
+FK p-values: Exploration: 0.001585; Aggression: 1.807e^-14
+SW p-values: Affiliation: 1.777e^-8; Exploration: 0.01837; Antennation: 0.0001166; Aggression: 1.49e^-9, Act: 0.0006617 
+Interpretation
+Antennation: When log aggression increases by 1, we expect antennation to increase by 0.7655 taps on the dummy. This relationship goes against expectations, because antenna tapping is a neutral, non-aggressive behavior of wasps. There is a positive relationship between antennation and aggression.
+Affiliation: When trial number increases by 1, we expect bodily contact time to increase by 24.67 seconds, holding seconds moving constant. A possible explanation of this coefficient is that as the wasp spends more time with the dummy throughout the trials, it is more willing to touch the dummy wasp. When the number of seconds moving increases by 1, we expect bodily contact time to decrease by 0.1134 seconds, holding trial number constant. This is implied, as when the wasp increases time moving around, it has less time to interact with the dummy. There is a negative relationship between affiliation and activity.
+Activity: When the number of chambers entered increases by 1, we expect the time spent moving to increase by 47.95 seconds. This is implied, as it takes time to enter a chamber. There is a positive relationship between activity and exploration.
+Exploration: When the time spent moving increases by 1 second, we expect the number of chambers entered to increase by 0.0152. There is a positive relationship between exploration and activity.
+Aggression: When compared to the baseline color gold, gold-silver and silver have the greatest effect on log aggression; they increase aggression. The colors green, red, white, and yellow decrease aggression relative to gold. This was further supported by our confidence interval for these coefficients. Gold-silver and silver were the only two confidence intervals that did not include 0, meaning none of the other colors had a significant effect on aggression, compared to the gold dummy color. We found through ANOVA testing that gold, the baseline color, has little effect on aggression. This indicates that gold-silver and silver specifically aggravate wasps, versus all metallic colors. When antennation increases by 1 antenna tap, the log aggression increases by 0.03224 movements. There is a positive relationship between aggression and antennation. 
+The majority of the behavior trait models include wasp ID, the random variable, as a predictor variable. While the coefficients of the wasp ID variable have no practical application, the inclusion of it in these models indicates that the individual wasp has a significant effect on its behavior. The individual personalities of these wasps, separate from dummy color, trial number, and body weight, have an effect on antennation, affiliation, and activity. For example, an individual wasp with a curious personality may be more inclined to interact with the dummy. For aggression and exploration, the individual wasp was not relevant in predicting these traits. Our models suggest that how aggressive a wasp is is not dependent on the wasp’s personality. The same can be said for exploration. 
+Comparison (the paper vs us)
+The main difference in our methods and those used in the paper is that the paper utilized the rpt function, while we used the lmer function. The rpt function estimates the repeatability of the data from a linear mixed effects model fitted by restricted maximum likelihood. Repeatability is a measure of the partitioning of variance into within-group and between-group sources of variance. Repeatability is often used in behavioral research because it quantifies individual differences, in this case, in different wasp personalities. 
+The paper generated two sets of models. There are five models in each set, one for each behavior trait. Their first set only includes one random effect, wasp ID. Their second set includes body mass and trial number as fixed effects, as well as wasp ID as a random effect. We created two sets of models, but our first set includes only fixed effects. Our second set of models includes the fixed effects and random effect, wasp ID. Our methods align with the authors’ in using mixed models for the second set. Our methods differ in the first set, where we focused on fixed effects and they focused on random effects.
+For each of the behavior traits, we compared the two models’ BICs to determine which was a better predictor of the trait. The models created in the paper isolated each behavior trait as the response variable, and no behavior traits were included as predictor variables in each other’s models. We found that certain behavior traits could help predict other behaviors in our models. 
+For antennation, our final model includes wasp ID and log aggression as predictors. This differs from the paper's corresponding mixed model, which includes wasp ID, dummy ID, body weight, and trial number.
+For aggression, our final model includes dummy color and antennation as predictors. This differs from the paper, as they used a mixed model including wasp ID, dummy ID, body weight, and trial number.
+For exploration, our final model includes seconds moving as a predictor. This differs from the paper, as they used a mixed model including wasp ID, dummy ID, body weight, and trial number.
+For affiliation, our final model includes trial number, seconds moving, and wasp ID as predictors. The paper’s mixed model includes wasp ID, dummy ID, body weight, and trial number.
+For activity, we found that the mixed model was a better fit than the simple model including only chambers entered as a predictor. The mixed model from the paper included individual ID, trial number, and body weight.
+A major component of the paper uses Spearman’s Rank Correlation Coefficients and the associated p-values to determine whether a meaningful correlation between different behaviors exists. Their statistically significant results were a positive correlation (rs = 0.89) between exploration and activity, a negative correlation  (rs = -0.35) between affiliation and activity, and a positive correlation  (rs = 0.33) between aggression and activity. With our models we can interpret the relationships between behaviors. Similar to the paper, we found a negative relationship between activity and affiliation and a positive relationship between exploration and activity. Unlike the paper, we found a positive relationship between log aggression and antennation.
+Our models also differed because the rpt package utilizes MCMCglmm to fit linear mixed models, while we used lmer. MCMCglmm uses a Bayesian approach, in which people make inferences based on priors about the parameters and the gathered data. Priors are assumptions about the values of the parameters before seeing the data. This method also uses Markov Chain Monte Carlo sampling, which estimates the distribution of parameters by generating many random samples. On the other hand, lmer uses a frequentist approach, in which inferences are based solely on the data at hand without having previous assumptions, or priors. lmer also uses a likelihood approach to estimate parameters by finding the values that make the observed data most probable. As a result, we can make conclusions based on this likelihood approach, which measures how likely the observed data is given certain parameter values. To simplify, using MCMCglmm method is like making a guess about an outcome, then using your gathered data to repeatedly improve the guess, keeping your prior beliefs in mind. Using lmer is like looking at the data directly to find the best-fitting solution without any prior assumptions. For the authors of the paper, using MCMCglmm is more fitting since they likely have prior knowledge about the behavior of wasps or experience from previous analysis of wasp behavior. Since we are working only with the scientific article and data the authors provided, lmer makes more sense for us. 
+Conclusion
+	Most of the difficulties we encountered during this project were centered around working with the data and fitting our model. Random and fixed effect models were not covered in the class until late so we struggled to interpret what they were doing up in their paper. Navigating through building the mixed effects models was difficult because we were not familiar with the package. Running diagnostics on our mixed effects models also caused us some difficulties. We realized we had to prepare the model in a different way in order to run tests on it. 
+Important Questions for Future Research
+To improve this work on the relationship between social and non-social personality traits in paper wasps, we considered factors such as diversity, testing over time, environment, and expanding predictor variables. In terms of diversity, the authors could sample wasps from different regions or sample different types of wasps to examine potential variations in personality. Testing the wasps over time would allow us to see how or if a wasps’s personality would change over its life cycle. Alternatively, testing the same wasp individuals at different times would allow us to see the stability of the wasp’s personality. Changing the wasp environment would also allow us to further study personality through methods such as observing wasp behavior in the presence of a predator by exposing the wasps to the scent of a predator. We also suggest including more predictor variables or including only relevant predictor variables to better assess wasp personality. For example, body weight did not have a significant effect on any personality traits. Instead, the study can expand and include wasp rank or different gender wasps. Overall, an increased sample size would also benefit this study and allow the authors to have more generalizable findings.  
+Some lingering questions we have are (1) why does bodily contact increase every time the experiment is repeated (increasing trial number)? (2) Why is wasp ID an important factor in some models?
+
+Ryan: Much of the R work, building models and running tests
+Emily: Background research of statistical methods
+Dahlia: Summarizing in our report and slides
+Jaxi: Summarizing in our report and slides
+
+
+
+
+
+Appendix: 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -80,6 +150,11 @@ confint(aff_BF.model.BIC)
 lmer_model_affilitation <- lmer(bodily_contact_time ~ Trial + seconds_moving + (1|Wasp.ID), data = wasp)
 BIC(lmer_model_affilitation)
 ```
+
+```{r}
+lmer_model_affilitation
+```
+
 ```{r}
 plot(aff_backward.model.BIC)
 ```
@@ -135,6 +210,7 @@ ant_BF.model.BIC
 ```{r}
 lmer_model_ant <- lmer(anntenation ~ Log_aggression + (1|Wasp.ID), data = wasp)
 ```
+
 
 ```{r}
 plot(ant_BF.model.BIC)
@@ -340,7 +416,20 @@ library(MASS)
 
 ```{r}
 lmer_model_affilitation
-lmer_model_act
+```
+
+```{r}
 lmer_model_ant
+```
+```{r}
+lmer_model_act
+```
+
+```{r}
+agg_BF.model.BIC
+```
+
+```{r}
+exp_BF.model.BIC
 ```
 
